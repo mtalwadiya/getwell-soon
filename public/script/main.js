@@ -98,116 +98,121 @@
 			}
 	    });
 	}
-
-	$('#searchinput').typeahead({
-		hint : false,
-		highlight : true,
-		minLength : 3
-	}, {
-		name : 'symptom',
-		source : searchSymptoms
-	});
 	
 	
-	//Optimize autocomplete - don't trigger search for space and backspace
-	$('#searchinput').bind("keydown", function (event) {
-	    var keyCode = event.keyCode;
-
-	    if(keyCode == 8 || keyCode ==32){
-	    	triggerSearch = false;
-	    }else{
-	    	triggerSearch = true;
-	    }
-	});
-	
-	//Listen to a typeahead event for suggestion selection and capture the symptom Id
-	$('#searchinput').bind('typeahead:select', function(ev, suggestion) {
-	  var index = $.inArray(suggestion, matches);
-	  if(index > -1){
-		  symptId = matchesIds[index];
-	  }
-	});
-	
-	//Age textbox - allow just positive integer numbers max 2 digit
-	$('#age').bind("keypress", function (event) {
-	    var keyCode = event.keyCode;
-	    if($.inArray(keyCode, [43,44,45,46,101]) != -1){
-	    	return false;
-	    }
-	    if($(this).val().length >= 2) return false;
-	});
-	
-	//Prevent form submission on hitting enter
-	$('#mainForm').on('keyup keypress', function(e) {
-	  var keyCode = e.keyCode || e.which;
-	  if (keyCode === 13) { 
-	    e.preventDefault();
-	    return false;
-	  }
-	});
-	
-	$('#submitBtn').on("click", function(event) {
-		event.preventDefault();
+	$(document).ready(function() {
+		$('#searchinput').typeahead({
+			hint : false,
+			highlight : true,
+			minLength : 3
+		}, {
+			name : 'symptom',
+			source : searchSymptoms
+		});
 		
-		//Getting form data - https://api.jquery.com/serializeArray/
-		var formArray = $("#mainForm").serializeArray(); 
-		if(userData && userData.evidence){
-			//step 1+ - push symptom in evidence array
-			$.each(formArray, function( i, v ) {
-				userData.evidence.push({ "id": v.name, "choice_id": v.value})
-			});
-		}else{			
-			//step 0 - capture age,gender and primary symptom
-			if(formArray[1].value == ""){
-				alert("Please provide age");
-				return false;
-			}
-			if(formArray[3].value == ""){
-				alert("Please provide symptom");
-				return false;
-			}
+		
+		//Optimize autocomplete - don't trigger search for space and backspace
+		$('#searchinput').bind("keydown", function (event) {
+		    var keyCode = event.keyCode;
+
+		    if(keyCode == 8 || keyCode ==32){
+		    	triggerSearch = false;
+		    }else{
+		    	triggerSearch = true;
+		    }
+		});
+		
+		//Listen to a typeahead event for suggestion selection and capture the symptom Id
+		$('#searchinput').bind('typeahead:select', function(ev, suggestion) {
+		  var index = $.inArray(suggestion, matches);
+		  if(index > -1){
+			  symptId = matchesIds[index];
+		  }
+		});
+		
+		//Age textbox - allow just positive integer numbers max 2 digit
+		$('#age').bind("keypress", function (event) {
+		    var keyCode = event.keyCode;
+		    if($.inArray(keyCode, [43,44,45,46,101]) != -1){
+		    	return false;
+		    }
+		    if($(this).val().length >= 2) return false;
+		});
+		
+		
+		//Prevent form submission on hitting enter
+		$('#mainForm').on('keyup keypress', function(e) {
+		  var keyCode = e.keyCode || e.which;
+		  if (keyCode === 13) { 
+		    e.preventDefault();
+		    return false;
+		  }
+		});
+		
+		$('#submitBtn').on("click", function(event) {
+			event.preventDefault();
 			
-			userData = { 
-						"sex": formArray[2].value, 
-						"age": formArray[1].value, 
-						"evidence": [{ "id": symptId, "choice_id": "present"} ] 						    
-						}
-		}
-		
-		
-		$.ajax({
-			type: "POST",
-			url: infermedica.baseUrl + "diagnosis",
-			headers: {
-				  "app_id": infermedica.appId,
-				  "app_key": infermedica.appKey
-				},
-			contentType: "application/json; charset=utf-8",
-			dataType: "json",
-			data: JSON.stringify(userData),
-
-			success: function(data) {
-				//Stop condition
-				if(data.conditions && data.conditions[0]){
-					if(data.conditions[0].probability > 0.9 || userData.evidence.length > 20){
-						getConditionDetails(data.conditions[0].id, data.conditions[0].probability);
-						return;
-					}
+			//Getting form data - https://api.jquery.com/serializeArray/
+			var formArray = $("#mainForm").serializeArray(); 
+			if(userData && userData.evidence){
+				//step 1+ - push symptom in evidence array
+				$.each(formArray, function( i, v ) {
+					userData.evidence.push({ "id": v.name, "choice_id": v.value})
+				});
+			}else{			
+				//step 0 - capture age,gender and primary symptom
+				if(formArray[1].value == ""){
+					alert("Please provide age");
+					return false;
+				}
+				if(formArray[3].value == ""){
+					alert("Please provide symptom");
+					return false;
 				}
 				
-				//Render next question based on type 'group_multiple' or 'single'
-				if(data.question && data.question.items && data.question.items[0]){
-					if(data.question.type == 'group_multiple' || data.question.type == 'group_single'){
-						$( "#subForm" ).html($( "#multiTpl" ).render( data.question ));
-					}else{
-						$("#subForm").html($("#singleTpl").render( {name: data.question.text, id: data.question.items[0].id} ));
-					}						
-				}
-			},
-			error: function() {
-			  alert("Internal Server Error");
+				userData = { 
+							"sex": formArray[2].value, 
+							"age": formArray[1].value, 
+							"evidence": [{ "id": symptId, "choice_id": "present"} ] 						    
+							}
 			}
-	    });
+			
+			
+			$.ajax({
+				type: "POST",
+				url: infermedica.baseUrl + "diagnosis",
+				headers: {
+					  "app_id": infermedica.appId,
+					  "app_key": infermedica.appKey
+					},
+				contentType: "application/json; charset=utf-8",
+				dataType: "json",
+				data: JSON.stringify(userData),
+
+				success: function(data) {
+					//Stop condition
+					if(data.conditions && data.conditions[0]){
+						if(data.conditions[0].probability > 0.9 || userData.evidence.length > 20){
+							getConditionDetails(data.conditions[0].id, data.conditions[0].probability);
+							return;
+						}
+					}
+					
+					//Render next question based on type 'group_multiple' or 'single'
+					if(data.question && data.question.items && data.question.items[0]){
+						if(data.question.type == 'group_multiple' || data.question.type == 'group_single'){
+							$( "#subForm" ).html($( "#multiTpl" ).render( data.question ));
+						}else{
+							$("#subForm").html($("#singleTpl").render( {name: data.question.text, id: data.question.items[0].id} ));
+						}						
+					}
+				},
+				error: function() {
+				  alert("Internal Server Error");
+				}
+		    });
+			
+			
+		  });
 		
-		
-	  });
+	});

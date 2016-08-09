@@ -22,7 +22,7 @@ Following APIs are used:
 
 ##Try out
 
-A live version of the app is available - http://telegram.me/fun007_bot 
+A live version of the app is available - https://goo.gl/UsPNk2
 
 
 
