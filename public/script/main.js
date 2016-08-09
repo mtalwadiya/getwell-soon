@@ -8,8 +8,8 @@
 	
 	//https://developer.infermedica.com/docs
 	var infermedica =  {
-			appId : "812a4fc6",
-			appKey : "86bdf7046b85f15526383bd3fd4beb03",
+			appId : "f0d3e64f",
+			appKey : "516ed458bceb1c2339e7519b5c253d59",
 			baseUrl : "https://api.infermedica.com/v2/" 
 		}; 
 	
