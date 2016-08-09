@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Get Well Soon - Map</title>
+	<meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="css/bootstrap-paper.min.css" />
+	<link rel="stylesheet" type="text/css" href="css/storelocator.css" />
+	<link rel="stylesheet" href="css/star-rating.min.css" />
+</head>
+
+<body>
+
+<div class="navbar-header" style="margin-bottom: 15px;">
+   <a class="navbar-brand" href="/"><img src="/img/logo_small.png"/></a>
+   <div id="page-header" style="margin-left: 15px;">
+		<h3 class="bh-sl-title">Showing nearby hospitals and clinics for: <span id="speciality">all</span></h3>
+	</div>
+</div>
+
+<div id="map" style="display: none;"></div>
+
+<div class="bh-sl-container">
+	
+	<div id="bh-sl-map-container" class="bh-sl-map-container">
+		<div id="bh-sl-map" class="bh-sl-map"></div>
+		<div class="bh-sl-loc-list">
+			<ul class="list"></ul>
+		</div>
+	</div>
+</div>
+
+<script src="script/lib/jquery.min.js"></script>
+<script src="script/lib/handlebars.min.js"></script>
+<script src="script/lib/bootstrap.min.js"></script>
+
+<!-- Google Places JS API- https://developers.google.com/maps/documentation/javascript/places -->
+<script src="https://maps.google.com/maps/api/js?libraries=places"></script>
+
+<!-- Store locator jquery plugin using Google Maps API v3- https://github.com/bjorn2404/jQuery-Store-Locator-Plugin 
+Other jquery map plugins and samples- http://www.jqueryrain.com/example/jquery-map -->
+<script src="script/lib/storeLocator/jquery.storelocator.js"></script>
+
+<!-- JQuery star rating plugin for Bootstrap- https://github.com/kartik-v/bootstrap-star-rating -->
+<script src="script/lib/star-rating.min.js"></script>
+
+<script>
+
+var lat, lng;
+
+function initialize() {
+	
+  var speciality = window.location.hash.substr(1);
+  if(speciality != ""){
+	  $("#speciality").html(speciality);
+  }
+  
+  if (navigator.geolocation) {
+		navigator.geolocation.getCurrentPosition(function(position){
+			lat = position.coords.latitude;
+			lng = position.coords.longitude;
+			
+			searchPlaces(speciality);
+		}, function(error){
+			alert("Location detection failed. Please turn on location and try again.");
+		});
+	}else{
+		alert("Browser doesn't support Geolocation");
+	}  
+}
+
+
+function searchPlaces(speciality){
+	 var pyrmont = new google.maps.LatLng(lat, lng);
+
+	  var map = new google.maps.Map(document.getElementById('map'), {
+	      center: pyrmont,
+	      zoom: 15
+	    });
+	  
+	  if(speciality.endsWith("/ENT")){
+		  speciality = "ENT";
+	  }else if(speciality == 'Allergology'){
+		  speciality = "Allergy";
+	  }
+
+	  //Google Place types- https://developers.google.com/places/supported_types
+	  //types and 'health' are deprecated. use [type: 'hospital']
+	  var request = {
+	    location: pyrmont,
+	    radius: '2000',
+	    query: speciality,
+	    types: ['hospital', 'health']
+	  };
+
+	  var service = new google.maps.places.PlacesService(map);
+	  service.textSearch(request, callback);
+}
+
+var mapObjList = [];
+var mapObj;
+var retried = false;
+
+function callback(results, status) {
+  if (status == google.maps.places.PlacesServiceStatus.OK) {
+	  for (var i = 0; i < results.length; i++) {
+		 if(i>6) break;
+		 mapObj = {};
+		 mapObj.id = (i+1);
+	     mapObj.name = results[i].name;
+	     mapObj.lat = results[i].geometry.location.lat();
+	     mapObj.lng = results[i].geometry.location.lng();
+	     mapObj.address = results[i].formatted_address;
+	     //Place link on Google maps- https://maps.google.com/?q=URLEncode(full address)
+	     mapObj.web = "https://maps.google.com/?q="+encodeURIComponent(mapObj.name + " " + mapObj.address);
+	     if(results[i].rating){
+	    	 mapObj.rating = results[i].rating;
+	     }
+	     if(results[i].photos && results[i].photos[0]){
+	    	 mapObj.photo = results[i].photos[0].getUrl({'maxWidth': 100, 'maxHeight': 100});
+	     }
+	    	 	    	 
+	     mapObjList.push(mapObj);
+	  }
+	  
+	  $('#bh-sl-map-container').storeLocator({
+		    'mapSettings': {
+				zoom     : 13
+			},
+			'lengthUnit': 'km',
+			'kilometerLang': 'km',
+			'kilometersLang': 'kms',
+			'originMarker': true,
+			'dataRaw': mapObjList,
+			'dataType': 'json',
+			'slideMap' : false,
+			'defaultLoc': true,
+			'defaultLat': lat,
+			'defaultLng' : lng
+			//'autoGeocode': true
+				
+		});
+	  
+  }else if(status == google.maps.places.PlacesServiceStatus.ZERO_RESULTS && retried == false){
+	  retried = true;
+	  searchPlaces("Hospital");
+  }else{
+	  $('#bh-sl-map-container').html("No results found")
+  }
+}
+
+initialize();
+
+</script>
+
+</body>
+</html>

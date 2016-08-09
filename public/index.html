@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>Get Well Soon - Diagnosis Form</title>
+	<meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+	<link rel="manifest" href="manifest.json">
+
+	<!-- Include Bootstrap Material Design files:
+	 https://maxcdn.bootstrapcdn.com/bootswatch/3.3.6/paper/bootstrap.min.css -->
+	<link rel="stylesheet" href="css/bootstrap-paper.min.css" />
+	
+	<!-- CSS code for using typeahead.js with Bootstrap 3:
+	 https://github.com/bassjobsen/typeahead.js-bootstrap-css -->
+	<link rel="stylesheet" href="css/typeaheadjs.css" />
+	
+	<script src="script/lib/jquery.min.js"></script>
+	<script src="script/lib/bootstrap.min.js"></script>
+	
+	<!-- Autocomplete library - http://twitter.github.com/typeahead.js/
+	It consists of 2 components: the suggestion engine, Bloodhound, and the UI view, Typeahead.
+	The UI component is available as a jQuery plugin, which is included here. 
+	It's responsible for rendering suggestions and handling DOM interactions. -->
+	<script src="script/lib/typeahead.jquery.js"></script>
+	
+	<!--  Lightweight templating engine - https://github.com/BorisMoore/jsrender -->
+	<script src="script/lib/jsrender.min.js"></script>
+	
+	<script src="script/main.js"></script>	
+
+</head>
+
+<body>
+<div class="container">
+	<div class="navbar-header">     
+      <a class="navbar-brand" href="#"><img src="/img/logo_small.png"/></a>      
+    </div>
+
+
+    <div class="col-md-12">
+    <hr>
+	<form class="form-horizontal" id="mainForm">
+		<fieldset>
+
+			<!-- Form Name 
+			<legend>Get Well Soon</legend>-->
+
+		<div id="subForm">
+			<b>Please fill up the form to start Diagnosis: </b><br><br>
+			<!-- Text input-->
+			<div class="form-group">
+				<label class="col-md-4 control-label" for="textinput">Name</label>
+				<div class="col-md-4">
+					<input id="textinput" name="textinput" type="text"
+						placeholder="Your name" class="form-control input-md">
+
+				</div>
+			</div>
+
+			<!-- Text input-->
+			<div class="form-group">
+				<label class="col-md-4 control-label" for="Age">Age</label>
+				<div class="col-md-4">
+					<input id="age" name="Age" type="number"
+						placeholder="Your age in years" class="form-control input-md">
+
+				</div>
+			</div>
+
+			<!-- Multiple Radios -->
+			<div class="form-group">
+				<label class="col-md-4 control-label" for="gender">Gender</label>
+				<div class="col-md-4">
+					<div class="radio">
+						<label for="gender-0"> <input type="radio" name="gender"
+							id="gender-0" value="male" checked="checked"> Male
+						</label>
+					</div>
+					<div class="radio">
+						<label for="gender-1"> <input type="radio" name="gender"
+							id="gender-1" value="female"> Female
+						</label>
+					</div>
+				</div>
+			</div>
+
+			<!-- Search input-->
+			<div class="form-group">
+				<label class="col-md-4 control-label" for="searchinput">Symptom</label>
+				<div class="col-md-4">
+					<input id="searchinput" name="searchinput" type="search"
+						placeholder="How are you feeling"
+						class="form-control input-md">
+					<p class="help-block">Start typing and select a suggestion</p>
+				</div>
+			</div>
+		</div>
+			<!-- Button -->
+			<div class="form-group">
+				<label class="col-md-4 control-label" for="submitBtn"></label>
+				<div class="col-md-4">
+					<button id="submitBtn" name="submitBtn" class="btn btn-primary">Submit</button>
+				</div>
+			</div>
+
+		</fieldset>
+	</form>
+    </div>
+</div>
+
+
+<div class="modal fade" id="basicModal" tabindex="-1" role="dialog" aria-labelledby="basicModal" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header" style="border-bottom: 1px solid #e5e5e5;">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+            <h5 class="modal-title" id="modalLabel">Modal title</h5>
+            </div>
+            <div class="modal-body">
+                <h6  id="modalBody">Modal Body</h6>
+            </div>
+            <div class="modal-footer" style="border-top: 1px solid #e5e5e5;">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+<!-- Generate form markup here -  http://bootsnipp.com/forms -->
+<script id="singleTpl" type="text/x-jsrender">
+	<div class="form-group">
+	<label class="col-md-4 control-label">{{:name}}</label>
+	<div class="col-md-4">
+		<div class="radio">
+			<label> <input type="radio" name="{{:id}}" value="present" checked="checked"> Yes
+			</label>
+		</div>
+		<div class="radio">
+			<label> <input type="radio" name="{{:id}}" value="absent"> No
+			</label>
+		</div>
+		<div class="radio">
+			<label> <input type="radio" name="{{:id}}" value="unknown"> Don't know
+			</label>
+		</div>
+	</div>
+</div>
+</script>
+
+<!-- Nested templates - http://www.jsviews.com/#tagsyntax -->
+<script id="multiTpl" type="text/x-jsrender">
+<b>{{:text}}</b><br><br>
+{{for items tmpl="#singleTpl"/}}
+</script>
+
+
+<script id="reportTpl" type="text/x-jsrender">
+<div class="form-group">
+	<h5 class="col-md-8" style="text-align: center;">Here is your report: </h5>
+</div>
+
+<div class="form-group">
+  <label class="col-md-4 control-label">Condition</label>  
+  <div class="col-md-{{:nameSize}}">
+  <input type="text" value="{{:name}}" disabled class="form-control input-md">   
+  </div>
+  <div class="col-md-2">
+  <a href="#" class="btn btn-info" data-toggle="modal" data-target="#basicModal" id="condInfoBtn" style="display: none;background-color: #00BCD4;">
+  <span class="glyphicon glyphicon-info-sign" style="font-size: 17px;"> </span></a>
+  </div>
+</div>
+
+<div class="form-group">
+  <label class="col-md-4 control-label">Chances</label>  
+  <div class="col-md-2">
+  <input type="text" value="{{:probability}}" disabled class="form-control input-md">  
+  </div>
+</div>
+
+<div class="form-group">
+  <label class="col-md-4 control-label">Category</label>  
+  <div class="col-md-2">
+  <input type="text" value="{{:category}}" disabled class="form-control input-md">
+    
+  </div>
+</div>
+
+<div class="form-group">
+  <label class="col-md-4 control-label">Prevalence</label>  
+  <div class="col-md-2">
+  <input type="text" value="{{:prevalence}}" disabled class="form-control input-md">
+  </div>
+</div>
+
+<div class="form-group">
+  <label class="col-md-4 control-label">Severity</label>  
+  <div class="col-md-2">
+  <input type="text" value="{{:severity}}" disabled class="form-control input-md">    
+  </div>
+</div>
+
+<div class="form-group">
+  <label class="col-md-4 control-label" for="singlebutton"> </label>
+  <div class="col-md-4">
+	<button id="singlebutton" class="btn btn-success" onclick="window.open('/map.html#{{:category}}', '_self'); return false;"
+	style="background-color: #00BCD4;">
+		Find nearby {{:category}} hospitals</button>
+  </div>
+</div>
+</script>
+
+
+</body>
+</html>

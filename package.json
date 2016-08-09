@@ -1,0 +1,19 @@
+{
+	"name": "getwell-soon",
+	"version": "1.0.0",
+	"description": "Online diagnosis and doctor finder",
+	"main": "app.js",
+    "private": true,
+	"scripts": {
+		"start": "node app.js"
+	},
+	"dependencies": {
+		"body-parser": "^1.15.0",
+		"express": "^4.13.4",
+		"request": "^2.69.0"
+	},
+	"repository": {},
+	"engines": {
+		"node": "4.2.x"
+	} 
+}
