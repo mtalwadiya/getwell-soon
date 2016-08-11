@@ -8,6 +8,7 @@ Following APIs are used:
 1. Infermedica - https://developer.infermedica.com/docs
 2. MedlinePlus  - https://medlineplus.gov/webservices.html
 3. Google Places - https://developers.google.com/maps/documentation/javascript/places
+4. Wikipedia - https://www.mediawiki.org/wiki/API:Main_page
 
 	
 ##Steps: 

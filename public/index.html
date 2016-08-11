@@ -110,15 +110,34 @@
 </div>
 
 
-<div class="modal fade" id="basicModal" tabindex="-1" role="dialog" aria-labelledby="basicModal" aria-hidden="true">
+<div class="modal fade" id="condModal" tabindex="-1" role="dialog" aria-labelledby="condModal" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header" style="border-bottom: 1px solid #e5e5e5;">
             <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-            <h5 class="modal-title" id="modalLabel">Modal title</h5>
+            <h5 class="modal-title" id="condModalLabel">Modal title</h5>
             </div>
-            <div class="modal-body">
-                <h6  id="modalBody">Modal Body</h6>
+            <div class="modal-body" id="condModalBody" style="text-align: center;">
+            	<img src="/img/logo.png"/>
+                <p style="text-align: left;margin-top: 20px;">Modal Body</p>
+            </div>
+            <div class="modal-footer" style="border-top: 1px solid #e5e5e5;">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="modal fade" id="catModal" tabindex="-1" role="dialog" aria-labelledby="catModal" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header" style="border-bottom: 1px solid #e5e5e5;">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+            <h5 class="modal-title" id="catModalLabel">Modal title</h5>
+            </div>
+            <div class="modal-body" id="catModalBody" style="text-align: center;">
+            	<img src="/img/logo.png"/>
+                <p style="text-align: left;margin-top: 20px;">Modal Body</p>
             </div>
             <div class="modal-footer" style="border-top: 1px solid #e5e5e5;">
                 <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
@@ -167,7 +186,7 @@
   <input type="text" value="{{:name}}" disabled class="form-control input-md">   
   </div>
   <div class="col-md-2">
-  <a href="#" class="btn btn-info" data-toggle="modal" data-target="#basicModal" id="condInfoBtn" style="display: none;background-color: #00BCD4;">
+  <a href="#" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#condModal" id="condInfoBtn">
   <span class="glyphicon glyphicon-info-sign" style="font-size: 17px;"> </span></a>
   </div>
 </div>
@@ -183,7 +202,10 @@
   <label class="col-md-4 control-label">Category</label>  
   <div class="col-md-2">
   <input type="text" value="{{:category}}" disabled class="form-control input-md">
-    
+  </div> 
+  <div class="col-md-2">
+  <a href="#" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#catModal" id="catInfoBtn">
+  <span class="glyphicon glyphicon-info-sign" style="font-size: 17px;"> </span></a>  
   </div>
 </div>
 
@@ -204,8 +226,7 @@
 <div class="form-group">
   <label class="col-md-4 control-label" for="singlebutton"> </label>
   <div class="col-md-4">
-	<button id="singlebutton" class="btn btn-success" onclick="window.open('/map.html#{{:category}}', '_self'); return false;"
-	style="background-color: #00BCD4;">
+	<button id="singlebutton" class="btn btn-primary" onclick="window.open('/map.html#{{:category}}', '_self'); return false;">
 		Find nearby {{:category}} hospitals</button>
   </div>
 </div>

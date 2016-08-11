@@ -63,12 +63,12 @@
 				}else{
 					data.nameSize = 2;
 				}
-				console.log(data);
 				
 				$( "#subForm" ).html($( "#reportTpl" ).render( data ));
 				$('#submitBtn').hide();
 				
 				getConditionInfo(data.name);
+				getCategoryInfo(data.category);
 			},
 			error: function() {
 			  alert("Internal Server Error");
@@ -76,7 +76,7 @@
 	    });
 	}
 	
-	function getConditionInfo(name){
+	/*function getConditionInfo(name){
 		
 		//calling https://wsearch.nlm.nih.gov/ws/query?db=healthTopics&term=title:<name> 
 	    //As CORS is not supported by this service, requesting via proxy
@@ -95,6 +95,83 @@
 			},
 			error: function() {
 			  console.log("Error connecting nih.gov");
+			}
+	    });
+	}*/
+	
+	function getCategoryInfo(name){
+		$.ajax({
+			type: "GET",
+			url: "/wikiInfo?name="+name,
+
+			success: function(data) {
+				var notSet = true;
+				 if(data.query && data.query.pages){
+					 var obj = null;
+					 for(var key in data.query.pages) {
+					   if(data.query.pages[key]["index"] == 1) {
+					     obj = data.query.pages[key];
+					     break;
+					   }
+					 }
+					 if(obj && obj.extract){
+						 $( "#catModalLabel" ).html(obj.title);
+						 $( "#catModalBody p" ).html(obj.extract);
+						 if(obj.thumbnail && obj.thumbnail.source){
+							 $( "#catModalBody img" ).attr("src", obj.thumbnail.source);
+						 }
+						 notSet = false;
+					 }
+				 }
+				 if(notSet){
+					 $( "#catModalLabel" ).html(name);
+					 $( "#catModalBody" ).html("No details found.");
+				 }
+				 
+			},
+			error: function() {
+			  console.log("Error connecting wikipedia");
+			  $( "#catModalLabel" ).html(name);
+			  $( "#catModalBody" ).html("Error finding details.");
+			}
+	    });
+	}
+	
+	
+	function getConditionInfo(name){
+		$.ajax({
+			type: "GET",
+			url: "/wikiInfo?name="+name,
+
+			success: function(data) {
+				var notSet = true;
+				 if(data.query && data.query.pages){
+					 var obj = null;
+					 for(var key in data.query.pages) {
+					   if(data.query.pages[key]["index"] == 1) {
+					     obj = data.query.pages[key];
+					     break;
+					   }
+					 }
+					 if(obj && obj.extract){
+						 $( "#condModalLabel" ).html(obj.title);
+						 $( "#condModalBody p" ).html(obj.extract);
+						 if(obj.thumbnail && obj.thumbnail.source){
+							 $( "#condModalBody img" ).attr("src", obj.thumbnail.source);
+						 }
+						 notSet = false;
+					 }
+				 }
+				 if(notSet){
+					 $( "#condModalLabel" ).html(name);
+					 $( "#condModalBody" ).html("No details found.");
+				 }
+				 
+			},
+			error: function() {
+			  console.log("Error connecting wikipedia");
+			  $( "#condModalLabel" ).html(name);
+			  $( "#condModalBody" ).html("Error finding details.");
 			}
 	    });
 	}
