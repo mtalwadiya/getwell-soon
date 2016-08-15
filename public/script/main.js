@@ -76,29 +76,6 @@
 	    });
 	}
 	
-	/*function getConditionInfo(name){
-		
-		//calling https://wsearch.nlm.nih.gov/ws/query?db=healthTopics&term=title:<name> 
-	    //As CORS is not supported by this service, requesting via proxy
-		$.ajax({
-			type: "GET",
-			url: "/conditionInfo?name="+name,
-
-			success: function(data) {
-				 var $xml = $(data),
-				 text = $xml.find( "list document content[name='FullSummary']" ).first().text();
-				 if(text != ""){
-					 $( "#modalLabel" ).html(name);
-					 $( "#modalBody" ).html(text);
-					 $( "#condInfoBtn" ).show();
-				 }
-			},
-			error: function() {
-			  console.log("Error connecting nih.gov");
-			}
-	    });
-	}*/
-	
 	function getCategoryInfo(name){
 		$.ajax({
 			type: "GET",
@@ -229,12 +206,15 @@
 		$('#submitBtn').on("click", function(event) {
 			event.preventDefault();
 			
+			/*getConditionDetails("c_614", 0.9);
+			return;*/
+			
 			//Getting form data - https://api.jquery.com/serializeArray/
 			var formArray = $("#mainForm").serializeArray(); 
 			if(userData && userData.evidence){
 				//step 1+ - push symptom in evidence array
 				$.each(formArray, function( i, v ) {
-					userData.evidence.push({ "id": v.name, "choice_id": v.value})
+					userData.evidence.push({ "id": v.name, "choice_id": v.value});
 				});
 			}else{			
 				//step 0 - capture age,gender and primary symptom
@@ -251,7 +231,7 @@
 							"sex": formArray[2].value, 
 							"age": formArray[1].value, 
 							"evidence": [{ "id": symptId, "choice_id": "present"} ] 						    
-							}
+							};
 			}
 			
 			

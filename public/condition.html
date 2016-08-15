@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>Get Well Soon - Condition Search</title>
+	<meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+	<link rel="stylesheet" href="css/bootstrap-paper.min.css" />
+	<link rel="stylesheet" href="css/typeaheadjs.css" />
+	
+	<script src="script/lib/jquery.min.js"></script>
+	<script src="script/lib/bootstrap.min.js"></script>
+	<script src="script/lib/typeahead.jquery.js"></script>
+	<script src="script/condition.js"></script>
+
+</head>
+
+<body>
+
+<div class="container">
+   <div class="navbar-header">     
+	 <a class="navbar-brand" href="/"><img src="/img/logo_small.png" style="margin-top: -10px"/></a>   
+   </div>    
+</div>
+
+<div class="container" style="background-color: #f9f9f9; margin-top: 10px">
+    <div class="col-md-12">
+	<form class="form-horizontal" id="mainForm">
+		<fieldset>
+			
+			<!-- Form Name -->
+			<legend style="text-align: center;">Condition Search</legend>
+
+			<div class="form-group">
+				<label class="col-md-4 control-label" for="searchinput">Condition</label>
+				<div class="col-md-4">
+					<input id="searchinput" name="searchinput" type="search"
+						placeholder="Search for a medical condition"
+						class="form-control input-md">
+					<p class="help-block">Start typing and select a suggestion</p>
+				</div>
+			</div>
+
+		</fieldset>
+	</form>
+	
+	<div class="panel panel-default col-md-8 col-md-offset-2" id="condModal" style="display: none;">
+	  <div class="panel-heading"><h3 class="panel-title" id="condModalLabel" style="text-align: center;">Title</h3></div>
+	  <div class="panel-body" id="condModalBody" style="text-align: center;">
+	    <img src="/img/logo.png" style="max-width: 100%"/>
+        <p style="text-align: left;margin-top: 20px;">Body</p>
+	  </div>
+	</div>
+	
+	
+    </div>    
+   
+</div>
+
+</body>
+</html>

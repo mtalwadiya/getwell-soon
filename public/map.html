@@ -4,21 +4,82 @@
 	<title>Get Well Soon - Map</title>
 	<meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    
     <link rel="stylesheet" href="css/bootstrap-paper.min.css" />
 	<link rel="stylesheet" type="text/css" href="css/storelocator.css" />
 	<link rel="stylesheet" href="css/star-rating.min.css" />
+	<link rel="stylesheet" href="css/typeaheadjs.css" />
 </head>
 
 <body>
 
-<div class="navbar-header" style="margin-bottom: 15px;">
-   <a class="navbar-brand" href="/"><img src="/img/logo_small.png"/></a>
-   <div id="page-header" style="margin-left: 15px;">
+
+<div class="container">
+   <div class="navbar-header">     
+	 <a class="navbar-brand" href="/"><img src="/img/logo_small.png" style="margin-top: -10px"/></a>   
+	 <!-- <div id="page-header" style="margin-left: 15px;">
 		<h3 class="bh-sl-title">Showing nearby hospitals and clinics for: <span id="speciality">all</span></h3>
-	</div>
+	 </div> -->
+   </div>    
 </div>
 
 <div id="map" style="display: none;"></div>
+
+<div class="container" style="background-color: #f9f9f9; margin-top: 10px">
+    <div class="col-md-12">
+	<form class="form-horizontal" id="mainForm">
+		<fieldset>
+			
+			<!-- Form Name -->
+			<legend style="text-align: center;">Search Hospitals and Clinics</legend>
+
+		    <br>
+
+			<!-- Multiple Radios -->
+			<div class="form-group">
+				<label class="col-md-4 control-label" for="location">Location</label>
+				<div class="col-md-4">
+					<div class="radio">
+						<label for="gender-0"> <input type="radio" name="location"
+							id="location-0" value="nearby" checked="checked" 
+							onclick="javascript:document.getElementById('pacInput').style.display = 'none';"> Nearby
+						</label>
+					</div>
+					<div class="radio">
+						<label for="gender-1"> <input type="radio" name="location"
+							id="location-1" value="address" 
+							onclick="javascript:document.getElementById('pacInput').style.display = 'block';"> By Address
+						</label>
+					</div>
+					<input id="pacInput" name="pacInput" type="search"
+						placeholder="Type an address" class="form-control input-md" style="display: none;">
+				</div>
+			</div>
+
+			<!-- Search input-->
+			<div class="form-group">
+				<label class="col-md-4 control-label" for="searchinput">Specialization</label>
+				<div class="col-md-4">
+					<input id="searchinput" name="searchinput" type="search"
+						placeholder="Select a specialization"
+						class="form-control input-md">
+					<p class="help-block">Start typing and select a suggestion</p>
+				</div>
+			</div>
+			<!-- Button -->
+			<div class="form-group">
+				<input id="lat" name="lat" type="hidden"/>
+				<input id="lng" name="lng" type="hidden"/>
+				<label class="col-md-4 control-label" for="submitBtn"></label>
+				<div class="col-md-4">
+					<button id="submitBtn" class="btn btn-primary">Submit</button>
+				</div>
+			</div>
+
+		</fieldset>
+	</form>
+    </div>
+</div>
 
 <div class="bh-sl-container">
 	
@@ -44,116 +105,9 @@ Other jquery map plugins and samples- http://www.jqueryrain.com/example/jquery-m
 <!-- JQuery star rating plugin for Bootstrap- https://github.com/kartik-v/bootstrap-star-rating -->
 <script src="script/lib/star-rating.min.js"></script>
 
-<script>
+<script src="script/lib/typeahead.jquery.js"></script>
+<script src="script/map.js"></script>
 
-var lat, lng;
-
-function initialize() {
-	
-  var speciality = window.location.hash.substr(1);
-  if(speciality != ""){
-	  $("#speciality").html(speciality);
-  }
-  
-  if (navigator.geolocation) {
-		navigator.geolocation.getCurrentPosition(function(position){
-			lat = position.coords.latitude;
-			lng = position.coords.longitude;
-			
-			searchPlaces(speciality);
-		}, function(error){
-			alert("Location detection failed. Please turn on location and try again.");
-		});
-	}else{
-		alert("Browser doesn't support Geolocation");
-	}  
-}
-
-
-function searchPlaces(speciality){
-	 var pyrmont = new google.maps.LatLng(lat, lng);
-
-	  var map = new google.maps.Map(document.getElementById('map'), {
-	      center: pyrmont,
-	      zoom: 15
-	    });
-	  
-	  if(speciality.endsWith("/ENT")){
-		  speciality = "ENT";
-	  }else if(speciality == 'Allergology'){
-		  speciality = "Allergy";
-	  }
-
-	  //Google Place types- https://developers.google.com/places/supported_types
-	  //types and 'health' are deprecated. use [type: 'hospital']
-	  var request = {
-	    location: pyrmont,
-	    radius: '2000',
-	    query: speciality,
-	    types: ['hospital', 'health']
-	  };
-
-	  var service = new google.maps.places.PlacesService(map);
-	  service.textSearch(request, callback);
-}
-
-var mapObjList = [];
-var mapObj;
-var retried = false;
-
-function callback(results, status) {
-  if (status == google.maps.places.PlacesServiceStatus.OK) {
-	  for (var i = 0; i < results.length; i++) {
-		 if(i>6) break;
-		 mapObj = {};
-		 mapObj.id = (i+1);
-	     mapObj.name = results[i].name;
-	     mapObj.lat = results[i].geometry.location.lat();
-	     mapObj.lng = results[i].geometry.location.lng();
-	     mapObj.address = results[i].formatted_address;
-	     //Place link on Google maps- https://maps.google.com/?q=URLEncode(full address)
-	     mapObj.web = "https://maps.google.com/?q="+encodeURIComponent(mapObj.name + " " + mapObj.address);
-	     if(results[i].rating){
-	    	 mapObj.rating = results[i].rating;
-	     }
-	     if(results[i].photos && results[i].photos[0]){
-	    	 mapObj.photo = results[i].photos[0].getUrl({'maxWidth': 100, 'maxHeight': 100});
-	     }
-	    	 	    	 
-	     mapObjList.push(mapObj);
-	  }
-	  
-	  $('#bh-sl-map-container').storeLocator({
-		    'mapSettings': {
-				zoom     : 13
-			},
-			'lengthUnit': 'km',
-			'kilometerLang': 'km',
-			'kilometersLang': 'kms',
-			'originMarker': true,
-			'dataRaw': mapObjList,
-			'dataType': 'json',
-			'slideMap' : false,
-			'defaultLoc': true,
-			'defaultLat': lat,
-			'defaultLng' : lng
-			//'autoGeocode': true
-				
-		});
-	  
-  }else if(status == google.maps.places.PlacesServiceStatus.ZERO_RESULTS && retried == false){
-	  retried = true;
-	  searchPlaces("Hospital");
-  }else{
-	  $('#bh-sl-map-container').html("No results found")
-  }
-}
-
-$(document).ready(function() {
-	initialize();
-});
-
-</script>
 
 </body>
 </html>
