@@ -1,9 +1,9 @@
 	var triggerSearch = true;
-	var matches;
-	var matchesIds;
+	//var matches;
+	//var matchesIds;
 	
-	//default primary symptom = fever
-	var symptId = "s_98"; 
+	var symptId = ""; 
+	var sympt = "";
 	var userData;
 	
 	//https://developer.infermedica.com/docs
@@ -15,7 +15,7 @@
 	
 	
 	//Autocomplete box for primary symptom search
-	function searchSymptoms(q, cb, cbasync) {
+	/*function searchSymptoms(q, cb, cbasync) {
 		if(triggerSearch){
 			return $.ajax({
 				type: "GET",
@@ -43,7 +43,7 @@
 				}
 		    });	
 		}			
-	}
+	}*/
 	
 	function getConditionDetails(cid, cp){
 		$.ajax({
@@ -67,8 +67,8 @@
 				$( "#subForm" ).html($( "#reportTpl" ).render( data ));
 				$('#submitBtn').hide();
 				
-				getConditionInfo(data.name);
-				getCategoryInfo(data.category);
+				getWikiInfo(data.name, "#condModalLabel", "#condModalBody");
+				getWikiInfo(data.category, "#catModalLabel", "#catModalBody");
 			},
 			error: function() {
 			  alert("Internal Server Error");
@@ -76,7 +76,12 @@
 	    });
 	}
 	
-	function getCategoryInfo(name){
+	function getWikiInfo(name, modalLabel, modalBody){
+		if(name == 'Felon/whitlow'){
+			name = 'whitlow';
+	    }else if(name == 'Laryngology/ENT'){
+	    	name = 'Laryngology';
+	    }
 		$.ajax({
 			type: "GET",
 			url: "/wikiInfo?name="+name,
@@ -92,81 +97,66 @@
 					   }
 					 }
 					 if(obj && obj.extract){
-						 $( "#catModalLabel" ).html(obj.title);
-						 $( "#catModalBody p" ).html(obj.extract);
+						 $(modalLabel).html(obj.title);
+						 $(modalBody + " p").html(obj.extract);
 						 if(obj.thumbnail && obj.thumbnail.source){
-							 $( "#catModalBody img" ).attr("src", obj.thumbnail.source);
+							 $(modalBody + " img").attr("src", obj.thumbnail.source);
 						 }
 						 notSet = false;
 					 }
 				 }
 				 if(notSet){
-					 $( "#catModalLabel" ).html(name);
-					 $( "#catModalBody" ).html("No details found.");
+					 $(modalLabel).html(name);
+					 $(modalBody).html("No details found.");
 				 }
 				 
 			},
 			error: function() {
 			  console.log("Error connecting wikipedia");
-			  $( "#catModalLabel" ).html(name);
-			  $( "#catModalBody" ).html("Error finding details.");
-			}
-	    });
-	}
-	
-	
-	function getConditionInfo(name){
-		$.ajax({
-			type: "GET",
-			url: "/wikiInfo?name="+name,
-
-			success: function(data) {
-				var notSet = true;
-				 if(data.query && data.query.pages){
-					 var obj = null;
-					 for(var key in data.query.pages) {
-					   if(data.query.pages[key]["index"] == 1) {
-					     obj = data.query.pages[key];
-					     break;
-					   }
-					 }
-					 if(obj && obj.extract){
-						 $( "#condModalLabel" ).html(obj.title);
-						 $( "#condModalBody p" ).html(obj.extract);
-						 if(obj.thumbnail && obj.thumbnail.source){
-							 $( "#condModalBody img" ).attr("src", obj.thumbnail.source);
-						 }
-						 notSet = false;
-					 }
-				 }
-				 if(notSet){
-					 $( "#condModalLabel" ).html(name);
-					 $( "#condModalBody" ).html("No details found.");
-				 }
-				 
-			},
-			error: function() {
-			  console.log("Error connecting wikipedia");
-			  $( "#condModalLabel" ).html(name);
-			  $( "#condModalBody" ).html("Error finding details.");
+			  $(modalLabel).html(name);
+			  $(modalBody).html("Error finding details.");
 			}
 	    });
 	}
 	
 	
 	$(document).ready(function() {
+		var substringMatcher = function(strs) {
+		  return function findMatches(q, cb) {
+		    var matches, substrRegex;
+
+		    // an array that will be populated with substring matches
+		    matches = [];
+
+		    // regex used to determine if a string contains the substring `q`
+		    substrRegex = new RegExp(q, 'i');
+
+		    // iterate through the pool of strings and for any string that
+		    // contains the substring `q`, add it to the `matches` array
+		    $.each(strs, function(i, str) {
+		      if (substrRegex.test(str)) {
+		        matches.push(str);
+		      }
+		    });
+
+		    cb(matches);
+		  };
+		};
+		
+		
 		$('#searchinput').typeahead({
 			hint : false,
 			highlight : true,
-			minLength : 3
+			minLength : 1
 		}, {
 			name : 'symptom',
-			source : searchSymptoms
+			//source : searchSymptoms
+			source : substringMatcher(symptoms)
 		});
 		
 		
 		//Optimize autocomplete - don't trigger search for space and backspace
-		$('#searchinput').bind("keydown", function (event) {
+		/*$('#searchinput').bind("keydown", function (event) {
 		    var keyCode = event.keyCode;
 
 		    if(keyCode == 8 || keyCode ==32){
@@ -174,13 +164,14 @@
 		    }else{
 		    	triggerSearch = true;
 		    }
-		});
+		});*/
 		
 		//Listen to a typeahead event for suggestion selection and capture the symptom Id
 		$('#searchinput').bind('typeahead:select', function(ev, suggestion) {
-		  var index = $.inArray(suggestion, matches);
+		  var index = $.inArray(suggestion, symptoms);
 		  if(index > -1){
-			  symptId = matchesIds[index];
+			  symptId = symptomIds[index];
+			  sympt = suggestion;
 		  }
 		});
 		
@@ -206,7 +197,7 @@
 		$('#submitBtn').on("click", function(event) {
 			event.preventDefault();
 			
-			/*getConditionDetails("c_614", 0.9);
+			/*getConditionDetails("c_569", 0.9);
 			return;*/
 			
 			//Getting form data - https://api.jquery.com/serializeArray/
@@ -224,6 +215,10 @@
 				}
 				if(formArray[3].value == ""){
 					alert("Please provide symptom");
+					return false;
+				}
+				if(symptId == "" || sympt != formArray[3].value){
+					alert("Please select a symptom from the suggestions");
 					return false;
 				}
 				

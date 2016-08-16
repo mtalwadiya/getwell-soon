@@ -25,6 +25,9 @@ function getMoreInfo(name){
 
 
 function getConditionInfo(name){
+	if(name == 'Felon/whitlow'){
+		name = 'whitlow';
+    }
 	$.ajax({
 		type: "GET",
 		url: "/wikiInfo?name="+name,
