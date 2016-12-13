@@ -120,7 +120,20 @@
 	}
 	
 	
+	function enableButton(data, tabletop) {
+		infermedica.appId = data[0].appId;
+		infermedica.appKey = data[0].appKey;
+		$('#submitBtn').prop('disabled', false);
+	}
+	
+	
 	$(document).ready(function() {
+		
+		Tabletop.init( { key: '1URx7g1DlH7OYh4SV1Hi1RkxvtPpEKWihHA271YA3RUo',
+			 callback: enableButton,
+			 simpleSheet: true } );		 
+		
+		
 		var substringMatcher = function(strs) {
 		  return function findMatches(q, cb) {
 		    var matches, substrRegex;
@@ -209,22 +222,22 @@
 				});
 			}else{			
 				//step 0 - capture age,gender and primary symptom
-				if(formArray[1].value == ""){
+				if(formArray[0].value == ""){
 					alert("Please provide age");
 					return false;
 				}
-				if(formArray[3].value == ""){
+				if(formArray[2].value == ""){
 					alert("Please provide symptom");
 					return false;
 				}
-				if(symptId == "" || sympt != formArray[3].value){
+				if(symptId == "" || sympt != formArray[2].value){
 					alert("Please select a symptom from the suggestions");
 					return false;
 				}
 				
 				userData = { 
-							"sex": formArray[2].value, 
-							"age": formArray[1].value, 
+							"sex": formArray[1].value, 
+							"age": formArray[0].value, 
 							"evidence": [{ "id": symptId, "choice_id": "present"} ] 						    
 							};
 			}
