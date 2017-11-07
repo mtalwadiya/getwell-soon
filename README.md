@@ -23,7 +23,7 @@ Following APIs are used:
 
 ##Try out
 
-A live version of the app is available - https://goo.gl/UsPNk2
+A live version of the app is available - https://getwellsoon.ml
 
 
 
