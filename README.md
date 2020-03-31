@@ -1,4 +1,4 @@
-##Get Well Soon
+## Get Well Soon
 
 A Healthcare app which helps users do a preliminary diagnosis using an automated system.
 The app determines the user's condition/ailment based on the symptoms obtained from the user. Once the condition is determined, the app shows nearby doctors/hospitals for further consultation/treatment.
@@ -11,7 +11,7 @@ Following APIs are used:
 4. Wikipedia - https://www.mediawiki.org/wiki/API:Main_page
 
 	
-##Steps: 
+## Steps: 
 
 
 1. Create a developer account with [Infermedica](https://developer.infermedica.com) and get app_id and app_key. 
@@ -21,7 +21,7 @@ Following APIs are used:
 3. Deploy the app. 
 
 
-##Try out
+## Try out
 
 A live version of the app is available - https://getwellsoon.ml
 
